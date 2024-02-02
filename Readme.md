@@ -2,7 +2,7 @@
 
 ## Description
 
-This data analysis project, "Dream Housing Finance," focuses on automating the loan eligibility process based on customer details provided in online applications. The dataset, provided by Dream Housing Finance, covers data from four counties in Kenya. The analysis aims to gain insights into loan distribution, borrower demographics, loan book evolution over time, and factors influencing funding decisions.
+This data analysis project focuses on automating the loan eligibility process based on customer details provided in online applications. The dataset, provided by Dream Housing Finance, covers data from four counties in Kenya. The analysis aims to gain insights into loan distribution, borrower demographics, loan book evolution over time, and factors influencing funding decisions.
 
 ## Project Contents
 
