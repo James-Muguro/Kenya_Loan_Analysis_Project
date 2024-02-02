@@ -40,5 +40,3 @@ You can explore the sections sequentially or focus on areas of interest. Each se
 ## Acknowledgments
 
 This project wouldn't have been possible without the power of Python and libraries like NumPy, Pandas, and Scikit-learn. I'm especially grateful to the NumPy community for their efficient array manipulation tools and to the Scikit-learn developers for their accessible machine learning algorithms. Additionally, online tutorials and Stack Overflow responses provided invaluable guidance throughout the project.
-
-
