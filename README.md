@@ -132,8 +132,6 @@ Contributions welcome. Please open issues for bugs or feature requests. For code
 3. Run `pytest` locally and ensure tests pass.
 4. Open a pull request describing the change and link any relevant issue.
 
-If you want me to open a PR that adds CI (tests + lint) or a small anonymized sample dataset, tell me which and I can implement it.
-
 ---
 
 ## License
