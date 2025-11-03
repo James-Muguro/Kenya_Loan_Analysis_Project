@@ -1,0 +1,29 @@
+{
+    "data": {
+        "input_path": "data/loan_data.xlsx",
+        "model_path": "models",
+        "test_size": 0.2
+    },
+    "model": {
+        "random_state": 42,
+        "class_weights": {
+            "0": 0.7,
+            "1": 0.3
+        }
+    },
+    "clustering": {
+        "n_clusters": 3,
+        "features": [
+            "ApplicantIncome",
+            "LoanAmount"
+        ]
+    },
+    "analysis": {
+        "annual_interest_rate": 12.0,
+        "risk_thresholds": {
+            "low": 75,
+            "medium": 50,
+            "high": 25
+        }
+    }
+}
