@@ -1,145 +1,288 @@
-# Kenya Loan Analysis Project
+# Kenya Loan Analysis
 
-A reproducible, testable loan-analysis pipeline focused on Kenyan microloan applications.
-This repository contains modular code for data processing, analytics, model training, and a Streamlit UI for interactive exploration.
+> A reproducible, testable microloan analysis pipeline for Kenyan loan applications with interactive visualization and robust data handling.
 
-The project emphasizes defensible analysis, robust data coercion, and clear diagnostics so users can trust results when data are messy.
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![Tests](https://img.shields.io/badge/tests-pytest-green)](https://docs.pytest.org/)
+[![Code Style](https://img.shields.io/badge/code%20style-defensive-orange)]()
 
----
+## Overview
 
-## Status
+This project provides a complete pipeline for analyzing microloan application data with emphasis on:
 
-- ✅ Modularized into `src/` (data processing, modeling, analytics, Streamlit UI)
-- ✅ Unit tests under `tests/` (run with `pytest`)
-- ✅ Streamlit UI that renders Plotly figures returned by analytics functions
+- **Defensive data handling** — Robust numeric coercion with comprehensive diagnostics
+- **Modular architecture** — Clear separation between ETL, modeling, analytics, and UI
+- **Reproducibility** — Test coverage and deterministic results
+- **Interactive exploration** — Streamlit UI for dynamic analysis and visualization
 
----
+## Table of Contents
 
-## Highlights / Why this repo
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Data Schema](#data-schema)
+- [Project Structure](#project-structure)
+- [Usage](#usage)
+- [Testing](#testing)
+- [Diagnostics](#diagnostics)
+- [Contributing](#contributing)
+- [License](#license)
 
-- Clear separation of concerns: ETL, modeling, analytics, and UI live in separate modules.
-- Defensive data handling: numeric coercion with diagnostics for problematic rows/columns.
-- Analytics functions return diagnostics and Plotly `figure` objects instead of calling `fig.show()` (prevents noisy test output and keeps UI in charge of rendering).
-- Small test-suite that validates coercion and diagnostics behavior.
+## Features
 
----
+- ✅ **Data Processing** — ETL pipeline with feature engineering (EMI, DTI ratios)
+- ✅ **Machine Learning** — Model training with cross-validation and persistence
+- ✅ **Advanced Analytics** — Clustering, temporal patterns, and risk analysis
+- ✅ **Interactive UI** — Streamlit dashboard with Plotly visualizations
+- ✅ **Comprehensive Testing** — Unit tests for core functionality
+- ✅ **Quality Diagnostics** — Detailed reporting on data quality issues
 
-## Quick start (local)
+## Installation
 
-1. Create a virtual environment and install dependencies:
+### Prerequisites
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+- Python 3.8 or higher
+- pip package manager
 
-2. Run the Streamlit app locally:
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd kenya-loan-analysis
+   ```
+
+2. **Create and activate virtual environment**
+   ```bash
+   python -m venv .venv
+   
+   # On macOS/Linux
+   source .venv/bin/activate
+   
+   # On Windows
+   .venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Quick Start
+
+Launch the Streamlit application:
 
 ```bash
 streamlit run src/app.py
 ```
 
-3. In the Streamlit UI:
+Then:
+1. Upload an Excel or CSV file matching the expected schema
+2. Explore data quality diagnostics
+3. Train models and view performance metrics
+4. Run advanced analytics (clustering, temporal analysis, risk scoring)
+5. Generate and download insights reports
 
-- Upload an Excel file (or CSV if supported) containing the expected schema (see Data Schema below).
-- Run Model Training or Advanced Analytics (clustering, temporal, risk) and inspect diagnostics and figures.
-- Generate a PDF/HTML insights report (if the app runtime supports it) or download model artifacts from `models/`.
+## Data Schema
 
----
+The pipeline expects the following columns:
 
-## Data schema & expectations
+| Column | Type | Description |
+|--------|------|-------------|
+| `Loan_ID` | string | Unique loan identifier |
+| `Gender` | categorical | Applicant gender |
+| `Married` | categorical | Marital status |
+| `Dependents` | numeric/categorical | Number of dependents |
+| `Education` | categorical | Education level |
+| `Self_Employed` | categorical | Employment type |
+| `ApplicantIncome` | numeric | Primary applicant income |
+| `CoapplicantIncome` | numeric | Co-applicant income |
+| `LoanAmount` | numeric | Requested loan amount |
+| `Loan_Amount_Term` | numeric | Loan term in months |
+| `Credit_History` | numeric | Credit history indicator |
+| `Property_Area` | categorical | Property location type |
+| `Loan_Status` | categorical | Approval status (Y/N variants) |
+| `county` | categorical | Kenyan county |
+| `application_date` | date | Application submission date |
 
-The pipeline expects a DataFrame / Excel sheet with the following columns (see `src/data_processor.py` for the authoritative list):
+### Data Notes
 
-- Loan_ID
-- Gender
-- Married
-- Dependents
-- Education
-- Self_Employed
-- ApplicantIncome
-- CoapplicantIncome
-- LoanAmount
-- Loan_Amount_Term
-- Credit_History
-- Property_Area
-- Loan_Status
-- county
-- application_date
+- **Date parsing**: `application_date` supports day-first format
+- **Numeric coercion**: Non-numeric values are converted to NaN with diagnostic reporting
+- **Loan status**: Handles heterogeneous values (Y, N, Yes, No, sequences) with robust conversion logic
 
-Notes:
-- `application_date` should be parseable as a date (day-first supported).
-- Numeric fields may contain non-numeric noise; the pipeline will coerce to numeric using `pd.to_numeric(..., errors='coerce')` and report coercion counts in diagnostics.
-- `Loan_Status` can contain heterogeneous values (e.g., `Y`, `N`, `Yes`, `No`, or long Y/N sequences). The analytics functions include heuristics to robustly convert such values to a numeric approval score and will include diagnostics describing conversions and any unconvertable entries.
+## Project Structure
 
----
-
-## What each module does
-
-- `src/data_processor.py` — data loading, cleaning, feature engineering (EMI, TotalIncome, DTI), and encoding. Uses defensive assignment (no pandas chained-assignment) and exposes a `DataSchema` helper (see file).
-- `src/model_trainer.py` — training pipelines, cross-validation, model evaluation, feature importance extraction, and model persistence (to `models/`).
-- `src/analytics.py` — clustering (KMeans), temporal analysis (monthly/quarterly patterns), risk analysis, and reporting helpers. Each function returns a diagnostics dict and, when relevant, a Plotly `figure` object.
-- `src/app.py` — Streamlit application that wires components together and uses `st.plotly_chart` to render figures returned by analytics functions.
-
----
-
-## Diagnostics & failure modes
-
-The project surfaces diagnostics from the data processing and analytics steps so you can quickly see where data quality issues exist. Common diagnostics include:
-
-- Counts of values coerced to `NaN` when numeric coercion was applied.
-- The set of original `Loan_Status` strings encountered and how many were converted to numeric values versus left as NaN.
-- Rows excluded from clustering because required features were non-numeric or missing.
-
-Design contract (short):
-- Inputs: DataFrame or Excel file matching the schema above.
-- Outputs: Processed DataFrame + diagnostics dict (and Plotly `figure` objects where applicable).
-- Error modes: The functions prefer to return diagnostics describing failures rather than raising on common data problems; they only raise for unexpected programming errors (e.g., missing required library).
-
----
-
-## Tests
-
-Run unit tests with:
-
-```bash
-pytest -q
+```
+.
+├── src/
+│   ├── data_processor.py    # ETL, cleaning, feature engineering
+│   ├── model_trainer.py     # ML pipelines, evaluation, persistence
+│   ├── analytics.py         # Clustering, temporal, risk analysis
+│   └── app.py              # Streamlit UI application
+├── tests/                   # Unit tests (pytest)
+├── models/                  # Saved model artifacts
+├── requirements.txt         # Python dependencies
+└── README.md
 ```
 
-The test-suite includes checks for coercion and diagnostics in `src/analytics.py` and core processing logic in `src/data_processor.py`.
+### Module Responsibilities
 
----
+**`data_processor.py`**
+- Load and validate input data
+- Feature engineering (EMI, TotalIncome, DTI)
+- Encoding and normalization
+- Schema validation via `DataSchema` helper
 
-## Development
+**`model_trainer.py`**
+- Training pipeline configuration
+- Cross-validation and evaluation
+- Feature importance analysis
+- Model serialization
 
-- Use the `src/` package for changes. Keep functions small and return diagnostics for any coercion/cleaning step.
-- Replace `print()` with structured logging (module-level `logger = logging.getLogger(__name__)`).
-- When adding visualizations in `src/analytics.py`, return Plotly figure objects and let `src/app.py` render them.
+**`analytics.py`**
+- KMeans clustering analysis
+- Temporal pattern detection (monthly/quarterly)
+- Risk scoring and segmentation
+- Returns diagnostic dicts and Plotly figures
 
-Suggested next tasks (small improvements):
-- Add a tiny sample (anonymized) CSV for CI/demo.
-- Add GitHub Actions workflow that runs `pytest` and any Markdown linting on push.
+**`app.py`**
+- Streamlit UI components
+- File upload handling
+- Visualization rendering
+- Report generation
 
----
+## Usage
+
+### Programmatic Access
+
+```python
+from src.data_processor import load_and_process_data
+from src.model_trainer import train_model
+from src.analytics import run_clustering_analysis
+
+# Load and process data
+df, diagnostics = load_and_process_data('data.xlsx')
+
+# Train model
+model, metrics = train_model(df)
+
+# Run analytics
+cluster_results, fig = run_clustering_analysis(df)
+```
+
+### Command Line
+
+```bash
+# Run tests
+pytest -v
+
+# Run with coverage
+pytest --cov=src --cov-report=html
+
+# Run Streamlit app
+streamlit run src/app.py --server.port 8501
+```
+
+## Testing
+
+Run the test suite:
+
+```bash
+# All tests
+pytest
+
+# Verbose output
+pytest -v
+
+# Specific test file
+pytest tests/test_analytics.py
+
+# With coverage report
+pytest --cov=src --cov-report=term-missing
+```
+
+Test coverage includes:
+- Data coercion and validation
+- Numeric conversion edge cases
+- Diagnostic generation
+- Feature engineering logic
+
+## Diagnostics
+
+The pipeline provides comprehensive diagnostics at each stage:
+
+### Data Processing
+- Counts of values coerced to NaN
+- Invalid date formats
+- Missing required columns
+- Data type mismatches
+
+### Analytics
+- Original `Loan_Status` value distribution
+- Conversion success/failure rates
+- Rows excluded from clustering
+- Feature missingness reports
+
+### Design Contract
+
+**Inputs**: DataFrame or Excel/CSV file matching schema  
+**Outputs**: Processed DataFrame, diagnostics dict, Plotly figures (where applicable)  
+**Error Handling**: Returns diagnostics for data quality issues; raises only for programming errors
 
 ## Contributing
 
-Contributions welcome. Please open issues for bugs or feature requests. For code contributions, follow these steps:
+Contributions are welcome! Please follow these guidelines:
 
-1. Fork the repo and create a branch for your change.
-2. Add/modify tests where appropriate.
-3. Run `pytest` locally and ensure tests pass.
-4. Open a pull request describing the change and link any relevant issue.
+1. **Fork** the repository and create a feature branch
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
----
+2. **Write tests** for new functionality
+   ```bash
+   pytest tests/
+   ```
+
+3. **Follow conventions**
+   - Use type hints where applicable
+   - Return diagnostics for data operations
+   - Keep functions small and focused
+   - Use module-level logging instead of `print()`
+
+4. **Submit a pull request** with:
+   - Clear description of changes
+   - Link to related issues
+   - Test coverage for new code
+
+### Development Best Practices
+
+- Return Plotly figure objects from analytics functions
+- Let `app.py` handle rendering (avoid `fig.show()`)
+- Use defensive DataFrame operations (avoid chained assignment)
+- Provide structured diagnostics for debugging
+
+## Roadmap
+
+- [ ] Add anonymized sample dataset for demos
+- [ ] Implement CI/CD with GitHub Actions
+- [ ] Add pre-commit hooks for code quality
+- [ ] Expand test coverage to >80%
+- [ ] Add API documentation with Sphinx
+- [ ] Support additional data formats (Parquet, JSON)
 
 ## License
 
-This project uses open-source dependencies listed in `requirements.txt`. The project itself is published under the repository license in `LICENSE`.
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
+
+Dependencies are listed in `requirements.txt` and subject to their respective licenses.
+
+## Support
+
+- **Issues**: [Open an issue](../../issues) for bugs or feature requests
+- **Discussions**: [Start a discussion](../../discussions) for questions or ideas
+- **Documentation**: Check inline docstrings and module comments
 
 ---
 
-## Contact
-
-If you need help running the app or have questions about the pipeline, leave an issue or contact the repository owner.
+**Made with** 🇰🇪 **for transparent, defensible loan analysis**
